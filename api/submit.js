@@ -33,7 +33,7 @@ export default async function handler(req, res) {
       filename,
       JSON.stringify(data, null, 2),
       {
-        access: "private",
+        access: "public",
         contentType: "application/json"
       }
     );
