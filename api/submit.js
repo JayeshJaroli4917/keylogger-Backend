@@ -1,10 +1,14 @@
 import { put } from "@vercel/blob";
+import {kv} from "@vercel/kv";
 
 export const config = {
   api: {
     bodyParser: true
   }
 };
+
+const MAX_WINNER=50;
+const WIN_PROBABILITY=0.1;
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -26,11 +30,39 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Username required" });
     }
 
+let wonChocolate = false;
+
+// Check if this user already won before
+const userKey = `chocolate_winner:${data.username}`;
+const alreadyWon = await kv.get(userKey);
+
+// Get total winner count
+const currentWinners =
+  (await kv.get("chocolate_winner_count")) || 0;
+
+if (!alreadyWon && currentWinners < MAX_WINNERS) {
+  const randomWin = Math.random() < WIN_PROBABILITY;
+
+  if (randomWin) {
+
+    await kv.set(userKey, true);
+
+    await kv.incr("chocolate_winner_count");
+
+    wonChocolate = true;
+  }
+}
+
     const filename = `keystrokes/${data.username}_${Date.now()}.json`;
 
     const blob = await put(
       filename,
-      JSON.stringify(data, null, 2),
+      JSON.stringify(
+        {
+          ...data,
+          username,
+          wonChocolate},
+         null, 2),
       {
         access: "public",
         contentType: "application/json"
