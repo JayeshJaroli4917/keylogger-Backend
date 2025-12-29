@@ -59,7 +59,7 @@ if (!alreadyWon && currentWinners < MAX_WINNERS) {
       filename,
       JSON.stringify(
         {
-          ...data,
+          data,
           username,
           wonChocolate},
          null, 2),
