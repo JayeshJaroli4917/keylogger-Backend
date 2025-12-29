@@ -2,7 +2,7 @@ import { put } from "@vercel/blob";
 
 function generateLottery() {
   return {
-    isWinner: Math.random() < 0.1, // 10%
+    isWinner: Math.random() < 1.0, 
     lotteryNumber: Math.floor(100000 + Math.random() * 900000),
     generatedAt: new Date().toISOString()
   };
