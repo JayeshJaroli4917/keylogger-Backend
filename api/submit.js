@@ -1,10 +1,10 @@
 import { put } from "@vercel/blob";
 
-/* 🔢 SIMPLE LOTTERY GENERATOR (JSON-SAFE) */
+/* 🎟️ LOTTERY (pure, JSON-safe) */
 function generateLottery() {
   return {
-    lotteryNumber: Math.floor(100000 + Math.random() * 900000), // 6-digit
-    isWinner: Math.random() < 0.1, // 10% chance
+    isWinner: Math.random() < 0.1, // 10%
+    lotteryNumber: Math.floor(100000 + Math.random() * 900000),
     generatedAt: new Date().toISOString()
   };
 }
@@ -35,17 +35,19 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Username required" });
     }
 
-    /* 🎟️ LOTTERY DATA (ONLY FOR BLOB) */
+    const username = data.username.trim().toLowerCase();
+
+    /* 🎟️ LOTTERY */
     const lottery = generateLottery();
 
-    const filename = `keystrokes/${data.username}_${Date.now()}.json`;
-
-    const blob = await put(
-      filename,
+    /* 📦 ONE FILE PER USER (OVERWRITE) */
+    await put(
+      `keystrokes/users/${username}.json`,
       JSON.stringify(
         {
           ...data,
-          lottery   // 👈 saved ONLY in blob
+          username,
+          lottery
         },
         null,
         2
@@ -56,10 +58,29 @@ export default async function handler(req, res) {
       }
     );
 
+    /* 🏆 IF WINNER → SEPARATE FILE */
+    if (lottery.isWinner) {
+      await put(
+        `keystrokes/winners/${username}.json`,
+        JSON.stringify(
+          {
+            ...data,
+            username,
+            lottery
+          },
+          null,
+          2
+        ),
+        {
+          access: "public",
+          contentType: "application/json"
+        }
+      );
+    }
+
     return res.status(200).json({
       success: true,
-      url: blob.url
-      // ⛔ no lottery logic returned if you don't want
+      wonLottery: lottery.isWinner
     });
 
   } catch (err) {
