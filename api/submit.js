@@ -10,8 +10,7 @@ function generateLottery() {
   const isWinner = Math.random() < 0.1; // 10% chance
   return {
     isWinner,
-    prize: isWinner ? "Chocolate 🍫" : "Better luck next time",
-    lotteryNumber: Math.floor(100000 + Math.random() * 900000) // 6-digit
+    prize: isWinner ? "Chocolate 🍫" : "Data sumitted successfully",
   };
 }
 
