@@ -57,12 +57,7 @@ if (!alreadyWon && currentWinners < MAX_WINNERS) {
 
     const blob = await put(
       filename,
-      JSON.stringify(
-        {
-          data,
-          username,
-          wonChocolate},
-         null, 2),
+      JSON.stringify(data, null, 2),
       {
         access: "public",
         contentType: "application/json"
