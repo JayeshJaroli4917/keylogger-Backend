@@ -1,6 +1,5 @@
 import { put } from "@vercel/blob";
 
-/* 🎟️ LOTTERY (pure, JSON-safe) */
 function generateLottery() {
   return {
     isWinner: Math.random() < 0.1, // 10%
@@ -37,10 +36,8 @@ export default async function handler(req, res) {
 
     const username = data.username.trim().toLowerCase();
 
-    /* 🎟️ LOTTERY */
     const lottery = generateLottery();
 
-    /* 📦 ONE FILE PER USER (OVERWRITE) */
     await put(
       `keystrokes/users/${username}.json`,
       JSON.stringify(
@@ -58,7 +55,6 @@ export default async function handler(req, res) {
       }
     );
 
-    /* 🏆 IF WINNER → SEPARATE FILE */
     if (lottery.isWinner) {
       await put(
         `keystrokes/winners/${username}.json`,
